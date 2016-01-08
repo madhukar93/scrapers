@@ -5,12 +5,8 @@ from rq import Queue
 from redis import Redis
 from unidecode import unidecode
 import logging
+requests.packages.urllib3.disable_warnings()
 
-# redis_conn = Redis()
-# q = Queue(connection=redis_conn)
-
-# 'https://bigbasket.com/mapi/v2.3.0/product-list/?sorted_on=alpha&slug=bread-dairy-eggs&page=1&type=pc'
-# dest_slug = "type=pc&slug=mineral-water"
 logger = logging.getLogger('bigbasket')
 logger.setLevel(logging.ERROR)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -110,14 +106,15 @@ class BigBasket:
                         )
                     ),
                 )
-                self.dbcursor.execute(insert_query)
-            except Exception as inst:
                 print insert_query
+                self.dbcursor.execute(insert_query)
+                conn.commit()
+            except Exception as inst:
                 logger.error(
                     "{type}: {message}: {dict}".format(
                         type=type(inst),
                         message=str(inst),
-                        dict=str(dict)
+                        dict=str(product_dict)
                     )
                 )
 
