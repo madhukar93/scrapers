@@ -84,29 +84,25 @@ class BigBasket:
         product_list = product_page_response['response']['product_map']['all']
         for product_dict in product_list:
             try:
-                insert_query = """
-                INSERT INTO bigbasket_product values ({values})
-                """.format(
-                    values=', '.join(
-                        map(
-                            lambda x: "'{}'".format(x),
-                            [unidecode(str(product_dict['sku'])),
-                             unidecode(str(product_dict['p_img_url'])),
-                             unidecode(str(product_dict['tlc_s'])),
-                             unidecode(str(product_dict['sp'])),
-                             unidecode(str(product_dict['mrp'])),
-                             unidecode(str(product_dict['p_brand'])),
-                             unidecode(str(product_dict['w'])),
-                             unidecode(str(product_dict['pc_n'])),
-                             unidecode(str(product_dict['tlc_n'])),
-                             unidecode(str(product_dict['p_desc']))
-                             ]
-                        )
-                    )
-                )
+                insert_query = "INSERT INTO bigbasket_product values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, )"
+
                 print unidecode(str(product_dict['p_desc']))
                 # print insert_query
-                self.dbcursor.execute(insert_query)
+                self.dbcursor.execute(
+                    insert_query,
+                    (
+                        unidecode(str(product_dict['sku'])),
+                        unidecode(str(product_dict['p_img_url'])),
+                        unidecode(str(product_dict['tlc_s'])),
+                        unidecode(str(product_dict['sp'])),
+                        unidecode(str(product_dict['mrp'])),
+                        unidecode(str(product_dict['p_brand'])),
+                        unidecode(str(product_dict['w'])),
+                        unidecode(str(product_dict['pc_n'])),
+                        unidecode(str(product_dict['tlc_n'])),
+                        unidecode(str(product_dict['p_desc'])),
+                    )
+                )
                 BigBasket.db_conn.commit()
             except Exception as inst:
                 logger.error(
