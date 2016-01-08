@@ -65,8 +65,7 @@ class BigBasket:
             headers=self.api_headers
         ).json()
         product_tab = product_page['response']['tab_info'][0]
-        page_count = product_tab['product_info']['p_count']
-
+        page_count = product_tab['product_info']['tot_pages']
         for page in range(0, page_count + 1):
             self.get_product_page(
                 category_slug,
@@ -86,8 +85,7 @@ class BigBasket:
         for product_dict in product_list:
             try:
                 insert_query = """
-                INSERT INTO bigbasket_product
-                values ({values})
+                INSERT INTO bigbasket_product values ({values})
                 """.format(
                     values=', '.join(
                         map(
@@ -104,14 +102,15 @@ class BigBasket:
                              unidecode(str(product_dict['p_desc']))
                              ]
                         )
-                    ),
+                    )
                 )
-                print insert_query
+                print unidecode(str(product_dict['p_desc']))
+                # print insert_query
                 self.dbcursor.execute(insert_query)
-                conn.commit()
+                BigBasket.db_conn.commit()
             except Exception as inst:
                 logger.error(
-                    "{type}: {message}: {dict}".format(
+                    "{type}: {message}: {dict}\n\t=====\n".format(
                         type=type(inst),
                         message=str(inst),
                         dict=str(product_dict)
