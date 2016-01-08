@@ -113,7 +113,7 @@ class BigBasket:
                 self.dbcursor.execute(insert_query)
             except Exception as inst:
                 print insert_query
-                logger.log(
+                logger.error(
                     "{type}: {message}: {dict}".format(
                         type=type(inst),
                         message=str(inst),
