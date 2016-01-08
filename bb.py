@@ -4,12 +4,19 @@ import sqlite3
 from rq import Queue
 from redis import Redis
 from unidecode import unidecode
+import logging
 
 # redis_conn = Redis()
 # q = Queue(connection=redis_conn)
 
 # 'https://bigbasket.com/mapi/v2.3.0/product-list/?sorted_on=alpha&slug=bread-dairy-eggs&page=1&type=pc'
 # dest_slug = "type=pc&slug=mineral-water"
+logger = logging.getLogger('bigbasket')
+logger.setLevel(logging.ERROR)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh = logging.FileHandler('errors.log')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
 
 
 class BigBasket:
@@ -81,34 +88,37 @@ class BigBasket:
 
         product_list = product_page_response['response']['product_map']['all']
         for product_dict in product_list:
-            insert_query = """
-            INSERT INTO bigbasket_product
-            values ({values})
-            """.format(
-                values=', '.join(
-                    map(
-                        lambda x: "'{}'".format(x),
-                        [str(product_dict['sku']),
-                         str(product_dict['p_img_url']),
-                         str(product_dict['tlc_s']),
-                         str(product_dict['sp']),
-                         str(product_dict['mrp']),
-                         str(product_dict['p_brand']),
-                         str(product_dict['w']),
-                         str(product_dict['pc_n']),
-                         str(product_dict['tlc_n']),
-                         str(product_dict['p_desc'])
-                         ]
-                    )
-                ),
-            )
             try:
+                insert_query = """
+                INSERT INTO bigbasket_product
+                values ({values})
+                """.format(
+                    values=', '.join(
+                        map(
+                            lambda x: "'{}'".format(x),
+                            [unidecode(str(product_dict['sku'])),
+                             unidecode(str(product_dict['p_img_url'])),
+                             unidecode(str(product_dict['tlc_s'])),
+                             unidecode(str(product_dict['sp'])),
+                             unidecode(str(product_dict['mrp'])),
+                             unidecode(str(product_dict['p_brand'])),
+                             unidecode(str(product_dict['w'])),
+                             unidecode(str(product_dict['pc_n'])),
+                             unidecode(str(product_dict['tlc_n'])),
+                             unidecode(str(product_dict['p_desc']))
+                             ]
+                        )
+                    ),
+                )
                 self.dbcursor.execute(insert_query)
             except Exception as inst:
                 print insert_query
-                print "{type}: {message}".format(
-                    type=type(inst),
-                    message=str(inst)
+                logger.log(
+                    "{type}: {message}: {dict}".format(
+                        type=type(inst),
+                        message=str(inst),
+                        dict=str(dict)
+                    )
                 )
 
     def scrape_all_categories(self):
