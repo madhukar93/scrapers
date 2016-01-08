@@ -84,7 +84,7 @@ class BigBasket:
         product_list = product_page_response['response']['product_map']['all']
         for product_dict in product_list:
             try:
-                insert_query = "INSERT INTO bigbasket_product values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, )"
+                insert_query = "INSERT INTO bigbasket_product values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
                 print unidecode(str(product_dict['p_desc']))
                 # print insert_query
