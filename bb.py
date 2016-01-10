@@ -10,7 +10,7 @@ requests.packages.urllib3.disable_warnings()
 logger = logging.getLogger('bigbasket')
 logger.setLevel(logging.ERROR)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-fh = logging.FileHandler('errors.log')
+fh = logging.FileHandler('bb_errors.log')
 fh.setFormatter(formatter)
 logger.addHandler(fh)
 
