@@ -192,4 +192,4 @@ class PepperTap:
 
     def get_all_products(self):
         for zone_id in self.zones.keys():
-            get_products_by_zone(zone_id)
+            self.get_products_by_zone(zone_id)
